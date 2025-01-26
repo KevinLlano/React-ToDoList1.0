@@ -1,8 +1,0 @@
-.app-container {
-    display: flex;
-    justify-content: center; /* Horizontal centering */
-    align-items: center;    /* Vertical centering */
-    height: 100vh;          /* Full viewport height */
-    background-color: #f0f0f0; /* Optional background color */
-  }
-  
