@@ -1,73 +1,74 @@
-import { useState } from "react";
-import TodoItem from "./TodoItem";
-import "./TodoList.css";
+import React, { useState } from 'react';
+import TodoItem from './TodoItem';
 
-// Initializes state variables: tasks, isEditing, editingTask, and newTask.
-const TodoList: React.FC = () => {
-  const [tasks, setTasks] = useState<string[]>(["Task 1", "Task 2"]);
+interface Task {
+  task: string;
+  reminder: string;
+}
+
+// TodoList.tsx
+interface TodoListProps {
+  tasks: Task[];
+  setReminder: (taskIndex: number, newReminder: string) => void;
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>; // Add setTasks here
+}
+
+
+const TodoList: React.FC<TodoListProps> = ({ tasks, setTasks, setReminder }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [editingTask, setEditingTask] = useState<string | null>(null);
   const [newTask, setNewTask] = useState("");
 
-  // Adds a new task if newTask is not empty and resets the input field.
   const addTask = () => {
     if (newTask) {
-      setTasks([...tasks, newTask]);
+      setTasks([...tasks, { task: newTask, reminder: "" }]);
       setNewTask("");
     }
   };
 
-  // Function to delete a task from the list
   const deleteTask = (taskToDelete: string) => {
-    setTasks(tasks.filter((task) => task !== taskToDelete));
+    setTasks(tasks.filter((task) => task.task !== taskToDelete));
   };
 
-  // Starts editing a task and sets editingTask to the selected task.
   const editTask = (taskToEdit: string) => {
-    setEditingTask(taskToEdit); // Set the task to edit
-    setIsEditing(true); // Start editing
+    setEditingTask(taskToEdit);
+    setIsEditing(true);
   };
 
-  // Saves the edited task and updates tasks. Resets editing state.
   const saveEditedTask = (newText: string) => {
-    setTasks(tasks.map((task) => (task === editingTask ? newText : task)));
-    setIsEditing(false);
+    setTasks(tasks.map((task) => (task.task === editingTask ? { ...task, task: newText } : task)));
     setEditingTask(null);
+    setIsEditing(false);
   };
 
-  // Renders an input field to add tasks, and a button to add them.
   return (
     <div>
-      <input
-        type="text"
-        value={newTask}
-        onChange={(e) => setNewTask(e.target.value)}
-        placeholder="Add a new task"
-      />
-      <button onClick={addTask}>Add</button>
-
-      {/* Map over tasks and render TodoItem component for each */}
-      <div className="todo-list">
-        {tasks.map((task, index) => (
-          <TodoItem
-            key={index}
-            task={task}
-            onDelete={() => deleteTask(task)}
-            onEdit={() => editTask(task)}
-          />
-        ))}
+      {tasks.map((task, index) => (
+        <TodoItem
+          key={index}
+          task={task}
+          taskIndex={index}
+          setReminder={setReminder}
+          onDelete={() => deleteTask(task.task)} 
+          onEdit={() => editTask(task.task)}
+        />
+      ))}
+      <div>
+        <input
+          type="text"
+          value={newTask}
+          onChange={(e) => setNewTask(e.target.value)}
+        />
+        <button onClick={addTask}>Add Task</button>
       </div>
-
-      {/* The task is saved when the input field goes out of focus. */}
-      {isEditing && editingTask && (
+      {isEditing && (
         <div>
           <input
             type="text"
-            defaultValue={editingTask}
-            onBlur={(e) => saveEditedTask(e.target.value)}
-            autoFocus
+            value={editingTask || ""}
+            onChange={(e) => setEditingTask(e.target.value)}
           />
-          <button onClick={() => saveEditedTask(editingTask)}>Save</button>
+          <button onClick={() => saveEditedTask(editingTask || "")}>Save Task</button>
         </div>
       )}
     </div>
