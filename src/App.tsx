@@ -1,25 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TodoList from "./components/TodoList";
 import "./App.css";
 
-const App: React.FC = () => {
-  const [tasks, setTasks] = useState([
-    { task: "Doctor appointment", reminder: "" },
-    { task: "Meeting with boss", reminder: "" },
-  ]);
+interface Task {
+  task: string;
+  reminder: string;
+}
 
-  // Function to set a reminder for a task
+const App: React.FC = () => {
+  // Load tasks from localStorage on initial load
+  const [tasks, setTasks] = useState<Task[]>(() => {
+    const savedTasks = localStorage.getItem('todoTasks');
+    return savedTasks ? JSON.parse(savedTasks) : [
+      { task: "Doctor appointment", reminder: "" },
+      { task: "Meeting with boss", reminder: "" }
+    ];
+  });
+
+  // Save tasks to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('todoTasks', JSON.stringify(tasks));
+    console.log("Saved tasks to localStorage:", tasks);
+  }, [tasks]);
+
+  // Debugginging Loging tasks to see if it changes
+  // useEffect(() => {
+  //   console.log("Current tasks:", tasks);
+  // }, [tasks]);
+
   const setReminder = (taskIndex: number, newReminder: string) => {
-    const updatedTasks = [...tasks];
-    updatedTasks[taskIndex].reminder = newReminder;
-    setTasks(updatedTasks);
+    setTasks(prevTasks => 
+      prevTasks.map((task, index) => 
+        index === taskIndex ? { ...task, reminder: newReminder } : task
+      )
+    );
   };
 
   return (
     <div className="app-container">
       <h1>Todo List</h1>
-      {/* Pass tasks and setReminder function to TodoList */}
-      // App.tsx
       <TodoList tasks={tasks} setReminder={setReminder} setTasks={setTasks} />
     </div>
   );

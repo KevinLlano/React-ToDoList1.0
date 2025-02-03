@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface ReminderProps {
   taskIndex: number;
@@ -8,6 +8,10 @@ interface ReminderProps {
 
 const Reminder: React.FC<ReminderProps> = ({ taskIndex, reminder, setReminder }) => {
   const [newReminder, setNewReminder] = useState(reminder);
+
+  useEffect(() => {
+    setNewReminder(reminder);
+  }, [reminder]);
 
   const handleReminderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewReminder(e.target.value);

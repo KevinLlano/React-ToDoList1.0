@@ -6,69 +6,81 @@ interface Task {
   reminder: string;
 }
 
-// TodoList.tsx
 interface TodoListProps {
   tasks: Task[];
   setReminder: (taskIndex: number, newReminder: string) => void;
-  setTasks: React.Dispatch<React.SetStateAction<Task[]>>; // Add setTasks here
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
 }
 
-
 const TodoList: React.FC<TodoListProps> = ({ tasks, setTasks, setReminder }) => {
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editingTask, setEditingTask] = useState<string | null>(null);
-  const [newTask, setNewTask] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingTaskOriginal, setEditingTaskOriginal] = useState<string | null>(null);
+  const [editedTaskText, setEditedTaskText] = useState('');
+  const [newTask, setNewTask] = useState('');
 
+  // Add missing function implementations
   const addTask = () => {
-    if (newTask) {
-      setTasks([...tasks, { task: newTask, reminder: "" }]);
-      setNewTask("");
+    if (newTask.trim()) {
+      setTasks([...tasks, { task: newTask.trim(), reminder: '' }]);
+      setNewTask('');
     }
   };
 
   const deleteTask = (taskToDelete: string) => {
-    setTasks(tasks.filter((task) => task.task !== taskToDelete));
+    setTasks(tasks.filter(task => task.task !== taskToDelete));
   };
 
   const editTask = (taskToEdit: string) => {
-    setEditingTask(taskToEdit);
+    setEditingTaskOriginal(taskToEdit);
+    setEditedTaskText(taskToEdit);
     setIsEditing(true);
   };
 
-  const saveEditedTask = (newText: string) => {
-    setTasks(tasks.map((task) => (task.task === editingTask ? { ...task, task: newText } : task)));
-    setEditingTask(null);
-    setIsEditing(false);
+  const saveEditedTask = () => {
+    if (editingTaskOriginal && editedTaskText.trim()) {
+      setTasks(tasks.map(task => 
+        task.task === editingTaskOriginal ? { ...task, task: editedTaskText.trim() } : task
+      ));
+      setEditingTaskOriginal(null);
+      setEditedTaskText('');
+      setIsEditing(false);
+    }
   };
 
   return (
     <div>
       {tasks.map((task, index) => (
         <TodoItem
-          key={index}
+          key={`${task.task}-${index}`}
           task={task}
           taskIndex={index}
           setReminder={setReminder}
-          onDelete={() => deleteTask(task.task)} 
+          onDelete={() => deleteTask(task.task)}
           onEdit={() => editTask(task.task)}
         />
       ))}
-      <div>
+      
+      {/* Add Task Section */}
+      <div className="add-task-container">
         <input
           type="text"
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
+          placeholder="Enter new task"
         />
         <button onClick={addTask}>Add Task</button>
       </div>
+
+      {/* Edit Task Section */}
       {isEditing && (
-        <div>
+        <div className="edit-task-container">
           <input
             type="text"
-            value={editingTask || ""}
-            onChange={(e) => setEditingTask(e.target.value)}
+            value={editedTaskText}
+            onChange={(e) => setEditedTaskText(e.target.value)}
+            placeholder="Edit task"
           />
-          <button onClick={() => saveEditedTask(editingTask || "")}>Save Task</button>
+          <button onClick={saveEditedTask}>Save Task</button>
         </div>
       )}
     </div>

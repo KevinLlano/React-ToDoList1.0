@@ -1,6 +1,28 @@
+/* TodoList.css */
 .todo-list {
-    margin: 20px;
-    padding: 10px;
-    border: 1px solid #ccc;
-  }
-  
+  padding: 1rem;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.todo-list input[type="text"] {
+  padding: 0.5rem;
+  width: 80%;
+  margin-right: 0.5rem;
+}
+
+.todo-list button {
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.todo-list button:hover {
+  background-color: var(--button-hover);
+}
